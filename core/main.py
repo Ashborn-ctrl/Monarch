@@ -1,15 +1,20 @@
 import os
+import sys
 import random
 import time
 import subprocess
 import importlib
-import sys
+
 from interface import clear, show_banner, loading, typing
 from menu import show_main_menu, show_modules, BASE_MODULE_DIR
 from commands import search_module
 from requirements import check_requirements
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Ensure project root is in Python path
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 
 
 def quote():
@@ -29,10 +34,10 @@ def run_module(import_path):
 
         module = importlib.import_module(f"modules.{import_path}")
 
-        # check dependencies
+        # install requirements if needed
         check_requirements(module)
 
-        # reload module (for development refresh)
+        # reload module (useful during development)
         importlib.reload(module)
 
         if hasattr(module, "run"):
@@ -61,38 +66,38 @@ def module_browser(start_path):
             return
 
 
-        # hidden command: help
+        # help command
         if choice == "help":
 
             print("\nAvailable Commands:\n")
-            print("help               Show this help")
+            print("help               Show help")
             print("search <keyword>   Search modules")
             print("info <number>      Show module info")
             print("update             Update Monarch")
+            print("refresh            Reload modules")
             print("uninstall          Remove Monarch")
-            print("refresh            Reload module list")
             print("exit               Return to main menu")
 
             input("\nPress Enter")
             continue
 
 
-        # hidden command: update
+        # update command
         if choice == "update":
 
-            subprocess.call(["bash","/opt/Monarch/installer/update.sh"])
+            subprocess.call(["bash", "/opt/Monarch/installer/update.sh"])
             input("\nPress Enter")
             continue
 
 
-        # hidden command: uninstall
+        # uninstall command
         if choice == "uninstall":
 
-            subprocess.call(["bash","/opt/Monarch/installer/uninstall.sh"])
+            subprocess.call(["bash", "/opt/Monarch/installer/uninstall.sh"])
             break
 
 
-        # hidden command: refresh
+        # refresh command
         if choice == "refresh":
 
             print("\nRefreshing modules...\n")
@@ -100,17 +105,17 @@ def module_browser(start_path):
             continue
 
 
-        # hidden command: exit
+        # exit command
         if choice == "exit":
             return
 
 
-        # hidden command: search
+        # search command
         if choice.startswith("search"):
 
             try:
 
-                keyword = choice.split(" ",1)[1]
+                keyword = choice.split(" ", 1)[1]
 
                 results = search_module(
                     [m["name"] for m in modules if m["type"] == "module"],
@@ -129,7 +134,7 @@ def module_browser(start_path):
             continue
 
 
-        # hidden command: info
+        # module info command
         if choice.startswith("info"):
 
             try:
@@ -141,9 +146,9 @@ def module_browser(start_path):
 
                     module = importlib.import_module(f"modules.{mod['import']}")
 
-                    print("\nName:", getattr(module,"name","Unknown"))
-                    print("Author:", getattr(module,"author","Unknown"))
-                    print("Description:", getattr(module,"description","No description"))
+                    print("\nName:", getattr(module, "name", "Unknown"))
+                    print("Author:", getattr(module, "author", "Unknown"))
+                    print("Description:", getattr(module, "description", "No description"))
 
             except:
                 print("Usage: info <number>")
@@ -152,7 +157,7 @@ def module_browser(start_path):
             continue
 
 
-        # number navigation
+        # numeric navigation
         if choice.isdigit():
 
             index = int(choice) - 1
@@ -168,7 +173,6 @@ def module_browser(start_path):
                 elif mod["type"] == "module":
 
                     run_module(mod["import"])
-
                     input("\nPress Enter to continue")
 
 
@@ -177,7 +181,7 @@ def main():
     clear()
     loading()
 
-    typing("👑 Monarch Awakening...",0.04)
+    typing("👑 Monarch Awakening...", 0.04)
     time.sleep(0.5)
 
     while True:
@@ -197,17 +201,17 @@ def main():
 
         elif choice == "2":
 
-            subprocess.call(["bash","/opt/Monarch/installer/update.sh"])
+            subprocess.call(["bash", "/opt/Monarch/installer/update.sh"])
             input("\nPress Enter")
 
         elif choice == "3":
 
-            subprocess.call(["bash","/opt/Monarch/installer/uninstall.sh"])
+            subprocess.call(["bash", "/opt/Monarch/installer/uninstall.sh"])
             break
 
         elif choice == "0":
 
-            typing("\n👑 The throne rests... until you arise again.",0.03)
+            typing("\n👑 The throne rests... until you arise again.", 0.03)
             time.sleep(1)
             clear()
             break
