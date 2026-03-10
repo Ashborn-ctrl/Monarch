@@ -177,7 +177,7 @@ def module_browser(start_path):
 
                 elif mod["type"] == "module":
 
-                    run_module(mod["import"])
+                    run_module(mod["path"])
                     input("\nPress Enter to continue")
 
 
