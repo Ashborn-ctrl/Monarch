@@ -4,6 +4,7 @@ import random
 import time
 import subprocess
 import importlib
+import importlib.util
 
 from interface import clear, show_banner, loading, typing
 from menu import show_main_menu, show_modules, BASE_MODULE_DIR
@@ -32,13 +33,13 @@ def run_module(import_path):
 
     try:
 
-        module = importlib.import_module(f"modules.{import_path}")
+        module_file = os.path.join(BASE_MODULE_DIR, import_path + ".py")
 
-        # install requirements if needed
+        spec = importlib.util.spec_from_file_location("module", module_file)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
         check_requirements(module)
-
-        # reload module (useful during development)
-        importlib.reload(module)
 
         if hasattr(module, "run"):
             module.run()
@@ -46,6 +47,7 @@ def run_module(import_path):
             print("Module missing run() function")
 
     except Exception as e:
+
         print("Error running module:", e)
 
 
