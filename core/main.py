@@ -2,9 +2,12 @@ import os
 import random
 import time
 import subprocess
+import importlib
 from interface import clear, show_banner, loading, typing
-from menu import show_menu
-from commands import run_module, search_module
+from menu import show_main_menu, show_modules, BASE_MODULE_DIR
+from commands import search_module
+from requirements import check_requirements
+
 
 def quote():
     quotes = [
@@ -15,6 +18,156 @@ def quote():
         "👑 Even kings must first conquer themselves."
     ]
     return random.choice(quotes)
+
+
+def run_module(import_path):
+
+    try:
+
+        module = importlib.import_module(f"modules.{import_path}")
+
+        # check dependencies
+        check_requirements(module)
+
+        # reload module (for development refresh)
+        importlib.reload(module)
+
+        if hasattr(module, "run"):
+            module.run()
+        else:
+            print("Module missing run() function")
+
+    except Exception as e:
+        print("Error running module:", e)
+
+
+def module_browser(start_path):
+
+    current_path = start_path
+
+    while True:
+
+        clear()
+        show_banner()
+
+        modules = show_modules(current_path)
+
+        choice = input("\nModules > ").strip()
+
+        if choice == "0":
+            return
+
+
+        # hidden command: help
+        if choice == "help":
+
+            print("\nAvailable Commands:\n")
+            print("help               Show this help")
+            print("search <keyword>   Search modules")
+            print("info <number>      Show module info")
+            print("update             Update Monarch")
+            print("uninstall          Remove Monarch")
+            print("refresh            Reload module list")
+            print("exit               Return to main menu")
+
+            input("\nPress Enter")
+            continue
+
+
+        # hidden command: update
+        if choice == "update":
+
+            subprocess.call(["bash","/opt/Monarch/installer/update.sh"])
+            input("\nPress Enter")
+            continue
+
+
+        # hidden command: uninstall
+        if choice == "uninstall":
+
+            subprocess.call(["bash","/opt/Monarch/installer/uninstall.sh"])
+            break
+
+
+        # hidden command: refresh
+        if choice == "refresh":
+
+            print("\nRefreshing modules...\n")
+            time.sleep(1)
+            continue
+
+
+        # hidden command: exit
+        if choice == "exit":
+            return
+
+
+        # hidden command: search
+        if choice.startswith("search"):
+
+            try:
+
+                keyword = choice.split(" ",1)[1]
+
+                results = search_module(
+                    [m["name"] for m in modules if m["type"] == "module"],
+                    keyword
+                )
+
+                print("\nResults:\n")
+
+                for r in results:
+                    print(r)
+
+            except:
+                print("Usage: search <keyword>")
+
+            input("\nPress Enter")
+            continue
+
+
+        # hidden command: info
+        if choice.startswith("info"):
+
+            try:
+
+                index = int(choice.split()[1]) - 1
+                mod = modules[index]
+
+                if mod["type"] == "module":
+
+                    module = importlib.import_module(f"modules.{mod['import']}")
+
+                    print("\nName:", getattr(module,"name","Unknown"))
+                    print("Author:", getattr(module,"author","Unknown"))
+                    print("Description:", getattr(module,"description","No description"))
+
+            except:
+                print("Usage: info <number>")
+
+            input("\nPress Enter")
+            continue
+
+
+        # number navigation
+        if choice.isdigit():
+
+            index = int(choice) - 1
+
+            if index < len(modules):
+
+                mod = modules[index]
+
+                if mod["type"] == "folder":
+
+                    current_path = mod["path"]
+
+                elif mod["type"] == "module":
+
+                    run_module(mod["import"])
+
+                    input("\nPress Enter to continue")
+
 
 def main():
 
@@ -29,71 +182,32 @@ def main():
         clear()
         show_banner()
 
-        print("\n" + quote())
-        print("\n")
+        print("\n" + quote() + "\n")
 
-        modules = show_menu()
+        show_main_menu()
 
-        command = input("\nMonarch > ").strip()
+        choice = input("\nMonarch > ").strip()
 
-        if command == "0" or command.lower() == "exit":
+        if choice == "1":
+
+            module_browser(BASE_MODULE_DIR)
+
+        elif choice == "2":
+
+            subprocess.call(["bash","/opt/Monarch/installer/update.sh"])
+            input("\nPress Enter")
+
+        elif choice == "3":
+
+            subprocess.call(["bash","/opt/Monarch/installer/uninstall.sh"])
+            break
+
+        elif choice == "0":
 
             typing("\n👑 The throne rests... until you arise again.",0.03)
             time.sleep(1)
             clear()
             break
-
-
-        elif command.lower() == "help":
-
-            print("\nAvailable Commands:\n")
-            print("run <number>      Run a module")
-            print("search <keyword>  Search modules")
-            print("help              Show commands")
-            print("exit              Exit Monarch")
-            print("S                 Update Monarch")
-            print("U                 Uninstall Monarch")
-
-
-        elif command.lower().startswith("run"):
-
-            try:
-                index = int(command.split()[1]) - 1
-                run_module(modules, index)
-            except:
-                print("Usage: run <module_number>")
-
-
-        elif command.lower().startswith("search"):
-
-            try:
-                keyword = command.split()[1]
-                results = search_module(modules, keyword)
-
-                print("\nSearch Results:\n")
-
-                for r in results:
-                    print(r)
-
-            except:
-                print("Usage: search <keyword>")
-
-
-        elif command.lower() == "s":
-
-            subprocess.call(["bash","/opt/Monarch/installer/update.sh"])
-
-
-        elif command.lower() == "u":
-
-            subprocess.call(["bash","/opt/Monarch/installer/uninstall.sh"])
-            break
-
-
-        else:
-            print("Unknown command. Type 'help' to see commands.")
-
-        input("\nPress Enter to continue...")
 
 
 if __name__ == "__main__":
