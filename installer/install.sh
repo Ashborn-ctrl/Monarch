@@ -10,14 +10,9 @@ if [ -d "$INSTALL_DIR" ]; then
     exit 1
 fi
 
-echo "Copying files..."
+echo "Cloning repository..."
 
-sudo mkdir -p $INSTALL_DIR
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_DIR="$(dirname "$SCRIPT_DIR")"
-
-sudo cp -r "$REPO_DIR"/* $INSTALL_DIR
+sudo git clone https://github.com/Ashborn-ctrl/Monarch.git $INSTALL_DIR
 
 echo "Creating launcher..."
 
