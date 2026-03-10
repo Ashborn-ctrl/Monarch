@@ -38,6 +38,7 @@ def run_module(import_path):
             print("Module file not found:", module_file)
             return
 
+        print("Loading module:", module_file)
         spec = importlib.util.spec_from_file_location("monarch_module", module_file)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
