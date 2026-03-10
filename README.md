@@ -27,7 +27,7 @@ The goal of Monarch is to provide a **simple and expandable toolkit framework** 
 Clone the repository and run the installer.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Monarch.git
+git clone https://github.com/Ashborn-ctrl/Monarch.git
 cd Monarch
 chmod +x installer/install.sh
 sudo ./installer/install.sh
