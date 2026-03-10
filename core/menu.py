@@ -1,5 +1,4 @@
 import os
-import importlib
 
 BASE_MODULE_DIR = os.path.join(os.path.dirname(__file__), "..", "modules")
 
@@ -25,32 +24,14 @@ def discover_modules(path):
 
         elif item.endswith(".py"):
 
-            rel = os.path.relpath(full, BASE_MODULE_DIR)
-            module_import = rel.replace("/", ".").replace(".py","")
+            display_name = item[:-3].replace("_"," ").title()
 
-            try:
-
-                mod = importlib.import_module(f"modules.{module_import}")
-
-                module_name = getattr(mod,"name",item[:-3])
-
-                modules.append({
-                    "type": "module",
-                    "name": module_name,
-                    "file": item,
-                    "path": full,
-                    "import": module_import
-                })
-
-            except:
-
-                modules.append({
-                    "type": "module",
-                    "name": item[:-3],
-                    "file": item,
-                    "path": full,
-                    "import": module_import
-                })
+            modules.append({
+                "type": "module",
+                "name": display_name,
+                "file": item,
+                "path": full
+            })
 
     return modules
 
