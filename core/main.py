@@ -3,10 +3,13 @@ import random
 import time
 import subprocess
 import importlib
+import sys
 from interface import clear, show_banner, loading, typing
 from menu import show_main_menu, show_modules, BASE_MODULE_DIR
 from commands import search_module
 from requirements import check_requirements
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def quote():
