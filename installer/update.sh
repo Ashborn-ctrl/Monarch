@@ -4,6 +4,6 @@ echo "Updating Monarch..."
 
 cd /opt/Monarch || exit
 
-git pull
+git pull origin main
 
 echo "⚔ Update completed."
