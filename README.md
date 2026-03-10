@@ -28,6 +28,7 @@ Clone the repository and run the installer.
 
 ```bash
 git clone https://github.com/Ashborn-ctrl/Monarch.git
+```bash
 cd Monarch
 chmod +x installer/install.sh
 sudo ./installer/install.sh
