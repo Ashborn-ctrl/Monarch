@@ -28,18 +28,17 @@ def quote():
     ]
     return random.choice(quotes)
 
-def run_module(import_path):
+def run_module(module_path):
 
     try:
 
-        module_file = os.path.join(BASE_MODULE_DIR, import_path.replace(".", "/") + ".py")
-
-        if not os.path.exists(module_file):
-            print("Module file not found:", module_file)
+        if not os.path.exists(module_path):
+            print("Module file not found:", module_path)
             return
 
-        print("Loading module:", module_file)
-        spec = importlib.util.spec_from_file_location("monarch_module", module_file)
+        print("Loading module:", module_path)
+
+        spec = importlib.util.spec_from_file_location("monarch_module", module_path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
