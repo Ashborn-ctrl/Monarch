@@ -32,7 +32,7 @@ def run_module(import_path):
 
     try:
 
-        module_file = os.path.join(BASE_MODULE_DIR, import_path + ".py")
+        module_file = os.path.join(BASE_MODULE_DIR, import_path.replace(".", "/") + ".py")
 
         if not os.path.exists(module_file):
             print("Module file not found:", module_file)
